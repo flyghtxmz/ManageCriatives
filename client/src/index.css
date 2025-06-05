@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 11% 98%; /* #F5F7FA */
+  --foreground: 222 84% 5%; /* #0F1419 */
+  --muted: 210 11% 96%; /* #F1F5F9 */
+  --muted-foreground: 215 16% 47%; /* #64748B */
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 84% 5%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 84% 5%;
+  --border: 214 32% 91%; /* #E2E8F0 */
+  --input: 214 32% 91%;
+  --primary: 221 83% 53%; /* #3B82F6 */
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 84% 5%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222 84% 5%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 221 83% 53%;
+  --radius: 0.75rem;
+  
+  /* Sidebar specific variables */
+  --sidebar-background: 0 0% 100%;
+  --sidebar-foreground: 222 84% 5%;
+  --sidebar-primary: 221 83% 53%;
+  --sidebar-primary-foreground: 210 40% 98%;
+  --sidebar-accent: 210 40% 96%;
+  --sidebar-accent-foreground: 222 84% 5%;
+  --sidebar-border: 214 32% 91%;
+  --sidebar-ring: 221 83% 53%;
+}
+
+.dark {
+  --background: 222 84% 5%;
+  --foreground: 210 40% 98%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  --popover: 222 84% 5%;
+  --popover-foreground: 210 40% 98%;
+  --card: 222 84% 5%;
+  --card-foreground: 210 40% 98%;
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  --primary: 221 83% 53%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 98%;
+  --accent: 217 33% 17%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62% 30%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 221 83% 53%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+}
+
+@layer components {
+  .stats-card {
+    @apply bg-white dark:bg-card rounded-xl shadow-sm p-6 border border-border;
+  }
+  
+  .sidebar-item {
+    @apply flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200;
+  }
+  
+  .sidebar-item-active {
+    @apply bg-primary/10 text-primary;
+  }
+  
+  .sidebar-item-inactive {
+    @apply text-muted-foreground hover:text-foreground hover:bg-accent;
+  }
+}
