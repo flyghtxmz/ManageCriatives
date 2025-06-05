@@ -1,0 +1,69 @@
+=====================================
+GUIA DE CONFIGURAÇÃO - GOOGLE DRIVE
+=====================================
+
+📁 LOCALIZAÇÃO DOS ARQUIVOS DE UPLOAD:
+======================================
+
+O sistema de upload de arquivos está localizado em:
+- Frontend: client/src/pages/dashboard.tsx (seção "requested-creatives")
+- Funcionalidade: Botão de upload aparece quando criativo está "em_progresso"
+- Validação: Só permite upload de vídeo para pedidos tipo "video" e imagem para "image"
+
+🔧 CONFIGURAÇÃO FUTURA DO GOOGLE DRIVE:
+========================================
+
+Para configurar a integração com Google Drive:
+
+1. OBTER CREDENCIAIS:
+   - Acesse: https://console.cloud.google.com/
+   - Crie um novo projeto ou use existente
+   - Ative a Google Drive API
+   - Crie credenciais (Service Account ou OAuth 2.0)
+   - Baixe o arquivo JSON de credenciais
+
+2. VARIÁVEIS DE AMBIENTE (.env):
+   - GOOGLE_DRIVE_CLIENT_ID=sua_client_id
+   - GOOGLE_DRIVE_CLIENT_SECRET=sua_client_secret
+   - GOOGLE_DRIVE_REDIRECT_URI=sua_redirect_uri
+   - GOOGLE_DRIVE_FOLDER_ID=id_da_pasta_destino
+   - GOOGLE_SERVICE_ACCOUNT_KEY=caminho_para_arquivo_json
+
+3. INSTALAÇÃO DE DEPENDÊNCIAS:
+   npm install googleapis multer
+
+4. ESTRUTURA DE PASTAS NO GOOGLE DRIVE:
+   Sistema Criativos/
+   ├── Imagens/
+   │   ├── Projeto_1/
+   │   └── Projeto_2/
+   └── Videos/
+       ├── Projeto_1/
+       └── Projeto_2/
+
+5. IMPLEMENTAÇÃO BACKEND:
+   - Criar middleware de upload (server/middleware/upload.js)
+   - Configurar rota para receber arquivos
+   - Implementar função de upload para Google Drive
+   - Salvar URL do arquivo no banco de dados
+
+6. PERMISSÕES:
+   - Compartilhar pasta do Google Drive com o service account
+   - Configurar permissões de leitura/escrita
+
+⚠️ IMPORTANTE:
+- Nunca commitar credenciais no repositório
+- Usar variáveis de ambiente para dados sensíveis
+- Configurar backup das credenciais
+- Testar upload com arquivos pequenos primeiro
+
+📝 PRÓXIMOS PASSOS:
+==================
+1. Configurar conta Google Cloud Platform
+2. Criar projeto e ativar APIs necessárias
+3. Gerar credenciais de service account
+4. Configurar variáveis de ambiente
+5. Implementar middleware de upload
+6. Testar funcionalidade completa
+
+=====================================

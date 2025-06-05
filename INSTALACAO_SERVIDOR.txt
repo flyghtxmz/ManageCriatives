@@ -1,0 +1,248 @@
+===============================================
+    GUIA DE INSTALAÇÃO EM SERVIDOR ZERADO
+===============================================
+
+Este documento explica como instalar e configurar o Sistema de Criativos 
+em um servidor completamente novo (VPS, Cloud Server, etc.).
+
+📋 PRÉ-REQUISITOS:
+==================
+
+1. Servidor Linux (Ubuntu 20.04+ recomendado)
+2. Acesso SSH ao servidor
+3. Domínio apontando para o servidor (opcional)
+
+🔧 PASSO A PASSO DE INSTALAÇÃO:
+===============================
+
+1. CONECTAR AO SERVIDOR:
+------------------------
+ssh root@seu-servidor.com
+# ou
+ssh usuario@seu-servidor.com
+
+2. ATUALIZAR O SISTEMA:
+-----------------------
+sudo apt update
+sudo apt upgrade -y
+
+3. INSTALAR NODE.JS:
+--------------------
+# Instalar Node.js 20 (versão LTS)
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Verificar instalação
+node --version
+npm --version
+
+4. INSTALAR POSTGRESQL:
+-----------------------
+sudo apt install postgresql postgresql-contrib -y
+
+# Iniciar o serviço
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+
+# Configurar usuário e banco
+sudo -u postgres psql
+CREATE USER sistemacriativos WITH PASSWORD 'senha_forte_aqui';
+CREATE DATABASE sistemacriativos OWNER sistemacriativos;
+GRANT ALL PRIVILEGES ON DATABASE sistemacriativos TO sistemacriativos;
+\q
+
+5. INSTALAR PM2 (GERENCIADOR DE PROCESSOS):
+-------------------------------------------
+sudo npm install -g pm2
+
+6. CLONAR/SUBIR O PROJETO:
+--------------------------
+# Opção A: Se usar Git
+git clone https://github.com/seu-usuario/sistema-criativos.git
+cd sistema-criativos
+
+# Opção B: Upload manual via FTP/SCP
+# Faça upload do projeto para /var/www/sistema-criativos
+
+7. CONFIGURAR VARIÁVEIS DE AMBIENTE:
+------------------------------------
+# Criar arquivo .env na raiz do projeto
+nano .env
+
+# Adicionar as seguintes variáveis:
+DATABASE_URL=postgresql://sistemacriativos:senha_forte_aqui@localhost:5432/sistemacriativos
+NODE_ENV=production
+PORT=5000
+
+8. INSTALAR DEPENDÊNCIAS:
+-------------------------
+npm install
+
+9. CONFIGURAR BANCO DE DADOS:
+-----------------------------
+# Aplicar migrações
+npm run db:push
+
+10. COMPILAR PROJETO (SE NECESSÁRIO):
+------------------------------------
+npm run build
+
+11. INICIAR COM PM2:
+-------------------
+# Iniciar aplicação
+pm2 start npm --name "sistema-criativos" -- run dev
+
+# Configurar para iniciar automaticamente
+pm2 startup
+pm2 save
+
+12. CONFIGURAR NGINX (OPCIONAL):
+-------------------------------
+sudo apt install nginx -y
+
+# Criar configuração do site
+sudo nano /etc/nginx/sites-available/sistema-criativos
+
+# Adicionar configuração:
+server {
+    listen 80;
+    server_name seu-dominio.com;
+    
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+# Ativar site
+sudo ln -s /etc/nginx/sites-available/sistema-criativos /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+
+13. CONFIGURAR FIREWALL:
+------------------------
+sudo ufw allow 22/tcp    # SSH
+sudo ufw allow 80/tcp    # HTTP
+sudo ufw allow 443/tcp   # HTTPS (se usar SSL)
+sudo ufw enable
+
+14. CONFIGURAR SSL (OPCIONAL MAS RECOMENDADO):
+----------------------------------------------
+sudo apt install certbot python3-certbot-nginx -y
+sudo certbot --nginx -d seu-dominio.com
+
+🔍 VERIFICAÇÃO DA INSTALAÇÃO:
+=============================
+
+1. Verificar se o PM2 está rodando:
+   pm2 list
+
+2. Verificar logs:
+   pm2 logs sistema-criativos
+
+3. Testar no navegador:
+   http://seu-servidor.com:5000
+   # ou
+   http://seu-dominio.com (se configurou Nginx)
+
+4. Testar login com:
+   Email: felipee.14@hotmail.com
+   Senha: 123456
+
+📁 ESTRUTURA DE ARQUIVOS NO SERVIDOR:
+=====================================
+
+/var/www/sistema-criativos/
+├── client/
+├── server/
+├── shared/
+├── package.json
+├── .env
+└── node_modules/
+
+🚨 COMANDOS IMPORTANTES:
+========================
+
+# Reiniciar aplicação
+pm2 restart sistema-criativos
+
+# Ver logs em tempo real
+pm2 logs sistema-criativos --lines 100
+
+# Parar aplicação
+pm2 stop sistema-criativos
+
+# Atualizar código (após fazer upload)
+pm2 restart sistema-criativos
+
+# Backup do banco
+pg_dump -U sistemacriativos sistemacriativos > backup.sql
+
+# Restaurar banco
+psql -U sistemacriativos sistemacriativos < backup.sql
+
+🔐 SEGURANÇA:
+=============
+
+1. Alterar senha padrão do admin no primeiro acesso
+2. Configurar SSL/HTTPS
+3. Usar senhas fortes para banco de dados
+4. Manter sistema atualizado
+5. Configurar backup automático
+
+📞 SOLUÇÃO DE PROBLEMAS:
+========================
+
+1. Aplicação não inicia:
+   - Verificar logs: pm2 logs sistema-criativos
+   - Verificar se porta 5000 está livre: netstat -tlnp | grep 5000
+
+2. Erro de banco:
+   - Verificar se PostgreSQL está rodando: sudo systemctl status postgresql
+   - Verificar conexão: psql -U sistemacriativos -d sistemacriativos
+
+3. Erro de permissões:
+   - Verificar proprietário dos arquivos: sudo chown -R www-data:www-data /var/www/sistema-criativos
+
+4. Aplicação lenta:
+   - Verificar recursos do servidor: htop
+   - Verificar logs de erro: pm2 logs sistema-criativos --err
+
+🔧 ATUALIZAÇÕES E MELHORIAS:
+============================
+
+Versão atual inclui:
+- Validação obrigatória de funções para usuários
+- Botões editar/remover para usuários e projetos
+- Exibição de nomes ao invés de IDs
+- Controle de acesso refinado (Facebook só para Admin/Gestor)
+- Fluxo completo de criativos entre Gestor e Editor
+- Campo domínio para projetos
+
+Para atualizar sistema em produção:
+1. Fazer backup do banco: pg_dump -U sistemacriativos sistemacriativos > backup.sql
+2. Subir novos arquivos
+3. Executar: npm install
+4. Aplicar mudanças no banco: npm run db:push
+5. Reiniciar: pm2 restart sistema-criativos
+
+🔐 PRIMEIRO ACESSO:
+===================
+
+Após instalação, acessar com:
+Email: felipee.14@hotmail.com
+Senha: 123456
+
+IMPORTANTE: Alterar credenciais padrão imediatamente!
+
+===============================================
+IMPORTANTE: Mantenha este arquivo atualizado
+conforme fizer modificações no sistema.
+===============================================

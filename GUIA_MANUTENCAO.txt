@@ -1,0 +1,186 @@
+===============================================
+    GUIA DE MANUTENÇÃO - SISTEMA DE CRIATIVOS
+===============================================
+
+Este documento explica onde estão localizados os principais arquivos e como fazer modificações no sistema.
+
+📁 ESTRUTURA DE PASTAS SIMPLIFICADA:
+=====================================
+
+/client/src/
+├── pages/          → Telas do sistema
+├── components/     → Componentes reutilizáveis
+├── lib/           → Configurações e utilitários
+└── index.css      → Estilos globais
+
+/server/
+├── routes.ts      → APIs do backend
+├── storage.ts     → Operações do banco de dados
+└── db.ts          → Configuração do banco
+
+/shared/
+└── schema.ts      → Estrutura do banco de dados
+
+🔧 PRINCIPAIS MODIFICAÇÕES:
+===========================
+
+1. INTEGRAÇÃO FACEBOOK:
+-----------------------
+Arquivos para modificar:
+→ client/src/pages/dashboard.tsx (linha ~230-263)
+   - Remova o badge "Em Manutenção"
+   - Ative o botão "Conectar Facebook"
+   - Adicione a lógica de conexão
+
+→ server/routes.ts
+   - Adicione rotas para API do Facebook
+   - Exemplo: app.get('/api/facebook/campaigns')
+
+→ Instalar dependências do Facebook:
+   npm install facebook-nodejs-business-sdk
+
+2. ADICIONAR NOVOS CAMPOS NO DASHBOARD:
+---------------------------------------
+→ shared/schema.ts
+   - Modifique as tabelas do banco
+   - Execute: npm run db:push
+
+→ client/src/pages/dashboard.tsx
+   - Adicione novos componentes na interface
+
+3. MODIFICAR SIDEBAR/MENU:
+--------------------------
+→ client/src/components/layout/sidebar.tsx
+   - Array menuItems (linha 22-63)
+   - Adicione novos itens de menu
+
+4. CORES E ESTILOS:
+-------------------
+→ client/src/index.css
+   - Variáveis CSS (linha 5-36)
+   - Classes personalizadas (linha 72-87)
+
+5. AUTENTICAÇÃO E USUÁRIOS:
+---------------------------
+→ server/routes.ts
+   - Rotas de login (linha 24-44)
+   - Gerenciamento de usuários (linha 47-85)
+
+→ client/src/lib/auth.ts
+   - Estado de autenticação
+   - Funções de login/logout
+
+📊 BANCO DE DADOS:
+==================
+
+Tabelas principais:
+→ users: Usuários do sistema
+→ projects: Projetos disponíveis
+→ creative_requests: Solicitações de criativos
+→ project_assignments: Atribuições de projetos
+
+Para modificar estrutura:
+1. Edite shared/schema.ts
+2. Execute: npm run db:push
+
+🎨 INTERFACE:
+=============
+
+Componentes de UI estão em:
+→ client/src/components/ui/
+
+Para criar novos componentes:
+→ Use os componentes existentes como base
+→ Siga o padrão Tailwind CSS
+→ Mantenha responsividade
+
+⚙️ CONFIGURAÇÕES IMPORTANTES:
+=============================
+
+Environment Variables:
+→ DATABASE_URL (banco de dados)
+→ Adicione FACEBOOK_APP_ID, FACEBOOK_APP_SECRET quando implementar
+
+Ports:
+→ Frontend: 5173 (Vite)
+→ Backend: 5000 (Express)
+→ Aplicação roda na porta 5000
+
+🔍 DEBUGGING:
+=============
+
+Logs do servidor:
+→ Console do terminal mostra requisições HTTP
+→ Erros aparecem no browser console
+
+Para adicionar logs:
+→ console.log() no frontend
+→ app.use middleware no backend
+
+📝 PADRÕES DE CÓDIGO:
+=====================
+
+Frontend:
+→ Use TypeScript
+→ Componentes funcionais com hooks
+→ TanStack Query para requests
+→ Zustand para estado global
+
+Backend:
+→ Express.js com TypeScript
+→ Drizzle ORM para banco
+→ Validação com Zod schemas
+
+🔄 FLUXO DE CRIATIVOS:
+======================
+
+1. GESTOR solicita criativo:
+   → Escolhe projeto (apenas os atribuídos a ele)
+   → Define tipo (imagem/vídeo) e descrição
+   → Criativo fica com status "solicitado"
+
+2. EDITOR visualiza solicitações:
+   → Vê todos os criativos "solicitados"
+   → Pode "Aceitar" (muda para "em_progresso")
+   → Fica atribuído a ele (assignedToId)
+
+3. EDITOR finaliza criativo:
+   → Marca como "Pronto"
+   → Aparece em "Criativos Prontos" do GESTOR
+
+4. VISUALIZAÇÕES por perfil:
+   → GESTOR: Vê seus criativos (solicitados/progresso/prontos)
+   → EDITOR: Vê todos criativos disponíveis + seus atribuídos
+   → ADMIN: Vê tudo
+
+🛡️ CONTROLES DE ACESSO:
+========================
+
+Dashboard Facebook:
+→ Apenas Admin e Gestor
+
+Gerenciar Usuários:
+→ Apenas Admin
+→ Validação: Pelo menos 1 função obrigatória
+→ Editar/Remover usuários disponível
+
+Gerenciar Projetos:
+→ Apenas Admin
+→ Campos: Nome, Domínio, Descrição
+→ Editar/Remover projetos disponível
+
+Solicitar Criativos:
+→ Gestor e Admin
+→ Projetos disponíveis conforme atribuição
+
+🚀 COMANDOS ÚTEIS:
+==================
+
+npm run dev          → Iniciar aplicação
+npm run db:push      → Aplicar mudanças no banco
+npx drizzle-kit studio → Interface visual do banco
+
+===============================================
+Mantenha este arquivo atualizado conforme
+fizer modificações no sistema.
+===============================================
